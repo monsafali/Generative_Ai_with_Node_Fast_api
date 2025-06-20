@@ -1,24 +1,7 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
 const axios = require("axios");
+const Chat = require("../models/chat.model");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-mongoose.connect("mongodb://localhost:27017/genai", {});
-
-const ChatSchema = new mongoose.Schema({
-  chatId: String,
-  question: String,
-  answer: String,
-  createdAt: { type: Date, default: Date.now },
-});
-
-const Chat = mongoose.model("Chat", ChatSchema);
-
-app.post("/api/chats/:chatId", async (req, res) => {
+exports.postChat = async (req, res) => {
   const { chatId } = req.params;
   const { question } = req.body;
   const chat = new Chat({ chatId, question, answer: "" });
@@ -37,9 +20,9 @@ app.post("/api/chats/:chatId", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "AI server error" });
   }
-});
+};
 
-app.get("/api/chats", async (req, res) => {
+exports.getChat = async (req, res) => {
   try {
     const chats = await Chat.find().sort({ createdAt: -1 }).limit(20);
 
@@ -61,9 +44,9 @@ app.get("/api/chats", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch chats" });
   }
-});
+};
 
-app.get("/api/chats/:chatId", async (req, res) => {
+exports.updateChat = async (req, res) => {
   const { chatId } = req.params;
   try {
     const messages = await Chat.find({ chatId }).sort({ createdAt: 1 });
@@ -75,9 +58,9 @@ app.get("/api/chats/:chatId", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch messages" });
   }
-});
+};
 
-app.delete("/api/chats/:chatId", async (req, res) => {
+exports.deleteChat = async (req, res) => {
   const { chatId } = req.params;
   try {
     await Chat.deleteMany({ chatId });
@@ -85,5 +68,4 @@ app.delete("/api/chats/:chatId", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to delete chat" });
   }
-});
-app.listen(5000, () => console.log("Backend running on http://localhost:5000"));
+};
