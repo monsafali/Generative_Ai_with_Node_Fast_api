@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 import google.generativeai as genai
@@ -16,6 +15,6 @@ class Query(BaseModel):
 
 @app.post("/generate")
 async def generate(query: Query):
-    model = genai.GenerativeModel("gemini-1.5-flash")  # ✅ Free model
+    model = genai.GenerativeModel("gemini-1.5-flash")  # free model
     response = model.generate_content(query.question)
     return {"answer": response.text.strip()}
